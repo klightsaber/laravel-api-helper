@@ -20,12 +20,16 @@ trait DocHelper
             $path = base_path();
 
             // 获取api路由
-            exec("php $path/artisan route:list|grep -E 'App'|awk '{print $3\":\"$5\":\"$8\":\"$9}'", $routes);
+            exec("php $path/artisan route:list|grep 'Modules'|awk '{print $3\":\"$5\":\"$8\":\"$9}'", $routes);
 
             // 处理数据
             $routes = array_map(function ($item) {
                 return str_replace(':|', '', $item);
             }, $routes);
+
+            $routes = array_filter($routes, function ($item) {
+                return strpos($item, 'App\\Http') === false && strpos($item, "Modules\\") !== false;
+            });
 
             return $routes;
         });
@@ -34,27 +38,20 @@ trait DocHelper
     /**
      * 获取所有模块
      *
-     * @param $routes
      * @return array
      */
-    protected function getModules($routes)
+    protected function getModules()
     {
-        return Cache::tags('modules')->remember('api_doc', config('session.lifetime'), function () use ($routes) {
+        return Cache::tags('modules')->remember('api_doc', config('session.lifetime'), function () {
 
-            // 筛选 App\Http\Controllers 下的控制器
-            $routes = $this->routesFilter($routes);
+            $path = base_path();
 
-            $modules = [];
+            // 获取模块
+            exec("php $path/artisan module:list|awk -F ' ' '{print $2}'", $modules);
 
-            foreach ($routes as $route) {
-                $attr = explode(':', $route);
-
-                $module = $this->getModule($attr[2]);
-
-                if (!in_array($module, $modules)) {
-                    array_unshift($modules, $module);
-                }
-            }
+            $modules = array_filter($modules, function ($item) {
+                return !empty($item) && $item != 'Name';
+            });
 
             return $modules;
         });
@@ -69,7 +66,7 @@ trait DocHelper
     protected function getModule($controller)
     {
         // 获取模块
-        $controller = str_replace('App\Http\Controllers\\', '', $controller);
+        $controller = str_replace('Modules\\', '', $controller);
         $module = Arr::first(explode('\\', $controller));
 
         return $module;
@@ -78,16 +75,14 @@ trait DocHelper
     /**
      * 获取指定模块下的api
      *
-     * @param        $routes
      * @param string $module
      * @return array
      */
-    protected function getApiByModule($routes, $module = '')
+    protected function getApiByModule($module = '')
     {
-        return Cache::tags("api_doc")->remember("doc_for_$module", config('session.lifetime'), function () use ($routes, $module) {
+        return Cache::tags("api_doc")->remember("doc_for_$module", config('session.lifetime'), function () use ($module) {
 
-            // 筛选有模块的控制器
-            $routes = $this->routesFilter($routes);
+            $routes = $this->getRoutes();
 
             // 筛选指定模块下的控制器
             if ($module) {
@@ -204,20 +199,5 @@ trait DocHelper
         }
 
         return $params;
-    }
-
-    /**
-     * 筛选有模块的控制器
-     *
-     * @param $routes
-     * @return array
-     */
-    private function routesFilter($routes)
-    {
-        $routes = array_filter($routes, function ($item) {
-            return substr_count($item, '\\') > 3;
-        });
-
-        return $routes;
     }
 }

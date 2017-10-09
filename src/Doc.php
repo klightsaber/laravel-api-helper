@@ -26,9 +26,7 @@ class Doc
      */
     public function modules()
     {
-        $routes = $this->getRoutes();
-
-        return $this->getModules($routes);
+        return $this->getModules();
     }
 
     /**
@@ -39,9 +37,7 @@ class Doc
      */
     public function api($module = '')
     {
-        $routes = $this->getRoutes();
-
-        return $this->getApiByModule($routes, $module);
+        return $this->getApiByModule($module);
     }
 
     /**
