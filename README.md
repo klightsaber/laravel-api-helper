@@ -8,7 +8,7 @@
 
 ##### 安装
 ```php
-composer require brooksyang/laravel-api-helper
+composer require brooksyang/laravel-api-helper:"dev-module-based"
 ```
 
 ##### 打印css资源
