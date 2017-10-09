@@ -18,8 +18,7 @@
     },
     "autoload": {
         "psr-4": {
-            "BrooksYang\\LaravelApiHelper\\": "src/",
-            "Modules\\": "Modules/"
+            "BrooksYang\\LaravelApiHelper\\": "src/"
         }
     },
     "extra": {
