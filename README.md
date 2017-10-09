@@ -1,5 +1,5 @@
 ##### 说明
-该扩展包根据路由及注释文件自动生成可视化api文档，并采用guzzlehttp进行调试
+该项目基于[laravel-modules](https://github.com/BrooksYang/laravel-modules)，根据路由及注释文件自动生成可视化api文档，并采用guzzlehttp进行调试
 
 ## Demo
 [点击访问](http://218.28.38.100:9001/api/docs)
@@ -24,6 +24,18 @@ CACHE_DRIVER=redis
 ##### 取消 csrf 验证
 ```php
 // 注释 app/Http/Kernel.php 中的 VerifyCsrfToken::class,
+```
+
+##### 自动加载Modules文件，
+```php
+{
+  "autoload": {
+    "psr-4": {
+      "App\\": "app/",
+      "Modules\\": "Modules/"
+    }
+  }
+}
 ```
 
 ## 使用
