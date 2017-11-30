@@ -15,7 +15,7 @@ trait DocHelper
      */
     protected function getRoutes()
     {
-        return Cache::tags('routes')->remember('api_doc', config('session.lifetime'), function () {
+        return Cache::tags(config('api-helper.cache_tag_prefix') . '_routes')->remember('api_doc', config('session.lifetime'), function () {
 
             $path = base_path();
 
@@ -42,7 +42,7 @@ trait DocHelper
      */
     protected function getModules()
     {
-        return Cache::tags('modules')->remember('api_doc', config('session.lifetime'), function () {
+        return Cache::tags(config('api-helper.cache_tag_prefix') . '_modules')->remember('api_doc', config('session.lifetime'), function () {
 
             $path = base_path();
 
@@ -80,7 +80,7 @@ trait DocHelper
      */
     protected function getApiByModule($module = '')
     {
-        return Cache::tags("api_doc")->remember("doc_for_$module", config('session.lifetime'), function () use ($module) {
+        return Cache::tags(config('api-helper.cache_tag_prefix') . '_api_doc')->remember("doc_for_$module", config('session.lifetime'), function () use ($module) {
 
             $routes = $this->getRoutes();
 
